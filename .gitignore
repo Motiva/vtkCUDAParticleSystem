@@ -1,0 +1,22 @@
+# Debug folder
+Debug
+
+# Doxygen html folder
+Documentation/Doxygen/html
+
+# Documentation files
+*.pdf
+
+# CVS folders
+CVS
+
+# Eclipse files
+.cproject
+.project
+.pydevproject
+
+# Temporary files
+*.swp
+
+# Logs
+*.log
