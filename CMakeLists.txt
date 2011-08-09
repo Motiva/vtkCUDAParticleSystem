@@ -14,8 +14,8 @@ PROJECT(vtkCUDAParticleSystem)
 SET(vtkCUDAParticleSystem_SRCS
   vtkCUDAParticleSystem.cxx
   vtkCUDAParticleSystem.cu
-  #vtkCUDAParticleSystemKernel.cu
   vtkCUDAMotionEquationSolver.cxx
+  vtkCUDAMidPointSolver.cxx
   vtkCUDAEulerSolver.cxx
   vtkCUDARK4Solver.cxx
   vtkCUDAVelocityVerletSolver.cxx
