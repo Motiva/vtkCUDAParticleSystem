@@ -49,11 +49,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 class vtkMassProperties;
 
-class vtkSpring;
-class vtkSpringCollection;
-class vtkParticle;
-class vtkParticleCollection;
-
 //! Implementation of the particle-spring deformation model
 /*!
  * The system is compounded of several collections of elements: springs, particles, links.

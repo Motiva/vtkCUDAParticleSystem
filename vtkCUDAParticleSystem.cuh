@@ -12,6 +12,6 @@ void threadSync();
 void copyArrayFromDevice(void* host, const void* device, struct cudaGraphicsResource **cuda_vbo_resource, int size);
 void copyArrayToDevice(void* device, const void* host, int offset, int size);
 
-void integrateSystem(float *pos, float *vel, float *acc, float deltaTime, uint numParticles);
+void integrateSystem(float *pos, float *vel, float deltaTime, uint numParticles);
 
 }

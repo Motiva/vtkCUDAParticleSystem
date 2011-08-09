@@ -18,7 +18,7 @@ SET(vtkCUDAParticleSystem_SRCS
   vtkCUDAMotionEquationSolver.cxx
   vtkCUDAEulerSolver.cxx
   vtkCUDARK4Solver.cxx
-  #vtkVelocityVerletSolver.cxx
+  vtkCUDAVelocityVerletSolver.cxx
 )
 
 SET_SOURCE_FILES_PROPERTIES(

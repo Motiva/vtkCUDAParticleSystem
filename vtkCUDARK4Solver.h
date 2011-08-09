@@ -94,14 +94,8 @@ private:
 	//! 4rd order derivative v
 	float * dv4;
 
-	//! accumulated x derivative
-	float * hAdx;
-	float * hAdv;
-
 	//! Evaluate derivatives on each step
 	void Evaluate(float *p, float *v, float *a, double deltaT, int order);
-
-	void Accumulate(float *p, float *v, float *a, double h);
 
 };
 

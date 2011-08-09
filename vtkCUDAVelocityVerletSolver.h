@@ -41,93 +41,42 @@ POSSIBILITY OF SUCH DAMAGE.
 ==========================================================================*/
 
 #pragma once
-#ifndef __vtkCUDAMotionEquationSolver_h
-#define __vtkCUDAMotionEquationSolver_h
+#ifndef __vtkCUDAVelocityVerletSolver_h
+#define __vtkCUDAVelocityVerletSolver_h
 
 #include "vtkCUDAParticleSystemWin32Header.h"
-#include "vtkObject.h"
-
-class vtkDoubleArray;
+#include "vtkCUDAMotionEquationSolver.h"
 
 class vtkCUDAParticleSystem;
 
-//! Implementation of the abstract motion equation solver
+//! Implementation of the semi-implicit Euler solver.
 
-class VTK_vtkCUDAParticleSystem_EXPORT vtkCUDAMotionEquationSolver : public vtkObject {
+class VTK_vtkCUDAParticleSystem_EXPORT vtkCUDAVelocityVerletSolver : public vtkCUDAMotionEquationSolver {
 public:
-
-	//! Type revision macro
-	vtkTypeRevisionMacro(vtkCUDAMotionEquationSolver, vtkObject);
-	//! Print solver info
+	//!Type Revision Macro
+	vtkTypeRevisionMacro(vtkCUDAVelocityVerletSolver, vtkCUDAMotionEquationSolver);
+	//! Create a new euler solver
+	static vtkCUDAVelocityVerletSolver * New();
+	//! Print object values
 	void PrintSelf(ostream& os, vtkIndent indent);
 
-	//!Enumeration of solver types
-	enum CUDAMotionEquationSolverType{
-		Euler = 0,
-		ModifiedEuler = 1,
-		VelocityVerlet = 2,
-		RungeKutta4 = 3
-	};
-
-	//! Set number of particles
-	vtkSetMacro(NumberOfParticles, double);// NumberOfParticles
-
-	//! Set time step
-	vtkSetMacro(DeltaTime, double);
-
-	//! Set residual error
-	vtkSetMacro(Residual, double);// NumberOfParticles
-
-	//! Set Deformation model
-	void SetDeformationModel(vtkCUDAParticleSystem * model);
-
-	//! Initialize solver.
-	/*!
-	 * Pure virtual method must be implemented in subclasses
-	 */
-	virtual void Init() = 0;
+	//! Initialize equation motion solver
+	virtual void Init();
 
 	//! Compute next step for every particle
 	/*!
-	 * Pure virtual method must be implemented in subclasses
 	 * \param particles collection of particles
 	 * \param dt time step
 	 */
-	virtual void ComputeNextStep(float *p, float *v, float *a) = 0;
+	virtual void ComputeNextStep(float *p, float *v, float *a);
 
 protected:
-	vtkCUDAMotionEquationSolver();
-	~vtkCUDAMotionEquationSolver();
-
-	//!Initialize flag
-	bool Initialized;
-
-	//! Solver deformation model
-	vtkCUDAParticleSystem * DeformationModel;
-
-	//! Number of particles
-	int NumberOfParticles;
-
-	//! Time step
-	double DeltaTime;
-
-	//!Residual Error
-	double Residual;
-
-
-	float * hPos;
-	float * hVel;
-	float * hAcc;
-
-	float * dPos;
-	float * dVel;
-	float * dAcc;
+	vtkCUDAVelocityVerletSolver();
+	~vtkCUDAVelocityVerletSolver();
 
 private:
-	vtkCUDAMotionEquationSolver(const vtkCUDAMotionEquationSolver&);            // Not implemented.
-	void operator=(const vtkCUDAMotionEquationSolver&);           // Not implemented.
-
-
+	vtkCUDAVelocityVerletSolver(const vtkCUDAVelocityVerletSolver&);            // Not implemented.
+	void operator=(const vtkCUDAVelocityVerletSolver&);           // Not implemented.
 };
 
 #endif

@@ -15,7 +15,14 @@ vtkCUDAMotionEquationSolver::vtkCUDAMotionEquationSolver()
 	this->NumberOfParticles = 0;
 	this->Residual = 1e-6;
 	this->Initialized = 0;
+	this->hPos = NULL;
+	this->hVel = NULL;
+	this->hAcc = NULL;
+	this->dPos = NULL;
+	this->dVel = NULL;
+	this->dAcc = NULL;
 }
+
 
 //----------------------------------------------------------------------------
 vtkCUDAMotionEquationSolver::~vtkCUDAMotionEquationSolver()

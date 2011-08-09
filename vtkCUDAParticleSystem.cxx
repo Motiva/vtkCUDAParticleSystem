@@ -11,10 +11,10 @@
 #include "vtkMath.h"
 
 #include "vtkCUDAParticleSystem.h"
-#include "vtkCUDAParticleSystem.cuh"
 #include "vtkCUDAMotionEquationSolver.h"
-#include "vtkCUDARK4Solver.h"
 #include "vtkCUDAEulerSolver.h"
+#include "vtkCUDAVelocityVerletSolver.h"
+#include "vtkCUDARK4Solver.h"
 
 vtkCxxRevisionMacro(vtkCUDAParticleSystem, "$Revision: 0.1 $");
 vtkStandardNewMacro(vtkCUDAParticleSystem);
@@ -45,12 +45,6 @@ vtkCUDAParticleSystem::~vtkCUDAParticleSystem()
 	delete [] this->hPos;
 	delete [] this->hVel;
 	delete [] this->hAcc;
-
-	//Free CUDA arrays
-	freeArray(this->dPos);
-	freeArray(this->dVel);
-	freeArray(this->dAcc);
-
 }
 
 //----------------------------------------------------------------------------
@@ -82,14 +76,6 @@ void vtkCUDAParticleSystem::Init()
 		memset(this->hIds, 0 , this->NumberOfSprings*2*sizeof(int));
 		this->hLength = new float[this->NumberOfSprings];
 		memset(this->hLength, 0 , this->NumberOfSprings*sizeof(float));
-
-		//Initialize CUDA device
-		cudaInit();
-
-		//Allocate device vectors memory
-		allocateArray((void **)&this->dPos, memSize);
-		allocateArray((void **)&this->dVel, memSize);
-		allocateArray((void **)&this->dAcc, memSize);
 
 		// Set particle parameters
 		for(int id = 0; id < this->NumberOfParticles; id++)
@@ -137,10 +123,10 @@ void vtkCUDAParticleSystem::Init()
 		this->Solver = vtkCUDAEulerSolver::New();
 		break;
 	case vtkCUDAMotionEquationSolver::VelocityVerlet:
-		//this->Solver = vtkVelocityVerletSolver::New();
+		this->Solver = vtkCUDAVelocityVerletSolver::New();
 		break;
 	case vtkCUDAMotionEquationSolver::RungeKutta4:
-		//this->Solver = vtkCUDARK4Solver::New();
+		this->Solver = vtkCUDARK4Solver::New();
 		break;
 	default:
 		break;
@@ -149,7 +135,6 @@ void vtkCUDAParticleSystem::Init()
 	//Initialize motion equation solver
 	this->Solver->SetDeformationModel(this);
 	this->Solver->SetNumberOfParticles(this->NumberOfParticles);
-	//this->Solver->SetHostVectors(this->hPos, this->hVel, this->hAcc);
 	this->Solver->SetDeltaTime(this->DeltaTime);
 	this->Solver->SetResidual(this->Residual);
 	this->Solver->Init();
@@ -184,21 +169,9 @@ int vtkCUDAParticleSystem::RequestData(
 	//Compute Collisions
 	this->ComputeContacts();
 
-	unsigned int memSize = this->NumberOfParticles * 4 * sizeof(float);
+	this->Solver->ComputeNextStep(this->hPos, this->hVel, this->hAcc);
 
-	// Copy host -> device
-	copyArrayToDevice(this->dPos, this->hPos, 0, memSize);
-	copyArrayToDevice(this->dVel, this->hVel, 0, memSize);
-	copyArrayToDevice(this->dAcc, this->hAcc, 0, memSize);
-
-	this->Solver->ComputeNextStep(this->dPos, this->dVel, this->dAcc);
-
-	// Copy Device -> host
-	copyArrayFromDevice(this->hPos, this->dPos, 0, memSize);
-	copyArrayFromDevice(this->hVel, this->dVel, 0, memSize);
-	//copyArrayFromDevice(this->hAcc, this->dAcc, 0, memSize);
-
-	DisplayParticleVectors();
+	//DisplayParticleVectors();
 
 	output->ShallowCopy(input);
 
@@ -352,9 +325,6 @@ void vtkCUDAParticleSystem::ComputeForces()
 		a[0] = f[0]*iMass;
 		a[1] = f[1]*iMass;
 		a[2] = f[2]*iMass;
-
-		//std::cout <<"Id: " << i <<"\ta: "<< a[0] << "," << a[1] << "," << a[2] <<
-		//				"\tf:"<< f[0] << "," << f[1] << "," << f[2] << endl;
 	}
 }
 
