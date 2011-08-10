@@ -123,28 +123,37 @@ protected:
 	//! System total number of Spring
 	int NumberOfSprings;
 
-	//! Host Data
+	// Host Data Vectors
 	// Particles
+	//! Particle position host vector
 	float * hPos;
+	//! Particle velocity host vector
 	float * hVel;
+	//! Particle acceleration host vector
 	float * hAcc;
+	//! Particle force host vector
 	float * hFor;
+	//! Particle mass host vector
 	float * hMss;
 
-	//Springs
+	// Springs
+	//! Spring particle identifiers
 	int * hIds; //particle Ids
+	//! Spring length. Distance between particles.
 	float * hLength;
 
-
-	//! Device Data
+	// Device Data
+	//! Particle position device vector
 	float * dPos;
+	//! Particle velocity device vector
 	float * dVel;
+	//! Particle acceleration device vector
 	float * dAcc;
-	//float * dFor;
 
 	//! Equation time step
 	double DeltaTime;
 
+	// System Parameters
 	//! Spring stiffness k.
 	double SpringCoefficient;
 	//! Distance coefficient. Maximum Percentage of elongation
@@ -177,6 +186,7 @@ private:
 	//! Compute inserted collisions
 	void ComputeContacts();
 
+	//! Enumeration of vector types
 	enum VectorType{
 		Position,
 		Velocity,

@@ -64,8 +64,9 @@ public:
 
 	//! Compute next step for every particle
 	/*!
-	* \param particles collection of particles
-	* \param deltaT time step
+	 * \param p particle position vector
+	 * \param v particle velocity vector
+	 * \param a particle acceleration vector
 	*/
 	virtual void ComputeNextStep(float *p, float *v, float *a);
 

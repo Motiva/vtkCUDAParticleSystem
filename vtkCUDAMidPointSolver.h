@@ -49,7 +49,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 class vtkCUDAParticleSystem;
 
-//! Implementation of the semi-implicit Euler solver.
+//! Implementation of the MidPoint solver.
 
 class VTK_vtkCUDAParticleSystem_EXPORT vtkCUDAMidPointSolver : public vtkCUDAMotionEquationSolver {
 public:
@@ -65,8 +65,9 @@ public:
 
 	//! Compute next step for every particle
 	/*!
-	 * \param particles collection of particles
-	 * \param dt time step
+	 * \param p particle position vector
+	 * \param v particle velocity vector
+	 * \param a particle acceleration vector
 	 */
 	virtual void ComputeNextStep(float *p, float *v, float *a);
 
@@ -78,7 +79,9 @@ private:
 	vtkCUDAMidPointSolver(const vtkCUDAMidPointSolver&);            // Not implemented.
 	void operator=(const vtkCUDAMidPointSolver&);           // Not implemented.
 
+	//! Intermediate position vector
 	float * p1;
+	//! Intermediate velocity vector
 	float * v1;
 };
 

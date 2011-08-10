@@ -47,8 +47,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCUDAParticleSystemWin32Header.h"
 #include "vtkObject.h"
 
-class vtkDoubleArray;
-
 class vtkCUDAParticleSystem;
 
 //! Implementation of the abstract motion equation solver
@@ -91,8 +89,9 @@ public:
 	//! Compute next step for every particle
 	/*!
 	 * Pure virtual method must be implemented in subclasses
-	 * \param particles collection of particles
-	 * \param dt time step
+	 * \param p particle position vector
+	 * \param v particle velocity vector
+	 * \param a particle acceleration vector
 	 */
 	virtual void ComputeNextStep(float *p, float *v, float *a) = 0;
 
@@ -112,22 +111,19 @@ protected:
 	//! Time step
 	double DeltaTime;
 
-	//!Residual Error
+	//! Residual Error
 	double Residual;
 
-
-	float * hPos;
-	float * hVel;
-	float * hAcc;
-
+	//! Particle position device vector
 	float * dPos;
+	//! Particle velocity device vector
 	float * dVel;
+	//! Particle acceleration device vector
 	float * dAcc;
 
 private:
 	vtkCUDAMotionEquationSolver(const vtkCUDAMotionEquationSolver&);            // Not implemented.
 	void operator=(const vtkCUDAMotionEquationSolver&);           // Not implemented.
-
 
 };
 
