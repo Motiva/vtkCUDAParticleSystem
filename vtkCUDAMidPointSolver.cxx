@@ -68,20 +68,22 @@ void vtkCUDAMidPointSolver::ComputeNextStep(float *p, float *v, float *a)
 	//CUDA procedure
 	//Full Euler step
 	integrateSystem(this->dVel, this->dAcc, dt05, this->NumberOfParticles);
-	integrateSystem(this->dPos, this->dVel, dt05, this->NumberOfParticles);
+	integrateSystem(this->dPos, this->dVel, dt, this->NumberOfParticles);
 
 	// Copy Device -> host
-	copyArrayFromDevice(v, this->dVel, 0, memSize);//Vn+0.5 = Vn + 0.5*dt
+	//copyArrayFromDevice(v, this->dVel, 0, memSize);//Vn+0.5 = Vn + 0.5*dt
 	copyArrayFromDevice(p, this->dPos, 0, memSize);//Xn+1 = Xn + Vn*dt + 0.5*An*dt²
 
 	//midpoint
 	this->DeformationModel->ComputeForces();
 	// Copy host -> device
-	copyArrayToDevice(this->dVel, v, 0, memSize);
+	copyArrayToDevice(this->dPos, p1, 0, memSize);
+	copyArrayToDevice(this->dVel, v1, 0, memSize);
 	copyArrayToDevice(this->dAcc, a, 0, memSize);
 
 	//Vn+1 = Vn + dt*An+1
-	integrateSystem(this->dVel, this->dAcc, dt, this->NumberOfParticles);
+	integrateSystem(this->dVel, this->dAcc, dt05, this->NumberOfParticles);
+	integrateSystem(this->dPos, this->dVel, dt05, this->NumberOfParticles);
 
 	// Copy Device -> host
 	copyArrayFromDevice(v, this->dVel, 0, memSize);

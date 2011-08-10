@@ -14,6 +14,7 @@
 #include "vtkCUDAMotionEquationSolver.h"
 #include "vtkCUDAEulerSolver.h"
 #include "vtkCUDAVelocityVerletSolver.h"
+#include "vtkCUDAMidPointSolver.h"
 #include "vtkCUDARK4Solver.h"
 
 vtkCxxRevisionMacro(vtkCUDAParticleSystem, "$Revision: 0.1 $");
@@ -125,6 +126,9 @@ void vtkCUDAParticleSystem::Init()
 	case vtkCUDAMotionEquationSolver::VelocityVerlet:
 		this->Solver = vtkCUDAVelocityVerletSolver::New();
 		break;
+	case vtkCUDAMotionEquationSolver::MidPoint:
+		this->Solver = vtkCUDAMidPointSolver::New();
+		break;
 	case vtkCUDAMotionEquationSolver::RungeKutta4:
 		this->Solver = vtkCUDARK4Solver::New();
 		break;
@@ -201,7 +205,7 @@ void vtkCUDAParticleSystem::SetCollisions(vtkIdList * ids, vtkDoubleArray * disp
 	if(ids->GetNumberOfIds() != displacements->GetNumberOfTuples())
 	{
 		vtkDebugMacro("Not the same number of contact ids and displacements")
-										return;
+												return;
 	}
 
 	this->CollisionIds->Reset();

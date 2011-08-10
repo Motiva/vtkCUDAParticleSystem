@@ -122,7 +122,7 @@ int main(int argc, char * argv[])
 
 	vtkCUDAParticleSystem* ParticleSpringSystem = vtkCUDAParticleSystem::New();
 	ParticleSpringSystem->SetInput(mesh);
-	ParticleSpringSystem->SetSolverType(vtkCUDAMotionEquationSolver::RungeKutta4);
+	ParticleSpringSystem->SetSolverType(vtkCUDAMotionEquationSolver::MidPoint);
 	ParticleSpringSystem->SetSpringCoefficient(250);
 	ParticleSpringSystem->SetDistanceCoefficient(10);
 	ParticleSpringSystem->SetDampingCoefficient(5);//Friction

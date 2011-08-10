@@ -66,7 +66,8 @@ public:
 		Euler = 0,
 		ModifiedEuler = 1,
 		VelocityVerlet = 2,
-		RungeKutta4 = 3
+		MidPoint = 3,
+		RungeKutta4 = 4
 	};
 
 	//! Set number of particles
