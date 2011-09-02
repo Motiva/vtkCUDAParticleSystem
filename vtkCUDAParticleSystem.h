@@ -184,7 +184,7 @@ private:
 	void operator=(const vtkCUDAParticleSystem&);           // Not implemented.
 
 	//! Compute inserted collisions
-	void ComputeContacts();
+	void ComputeCollisions();
 
 	//! Enumeration of vector types
 	enum VectorType{

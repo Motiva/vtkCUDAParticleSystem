@@ -48,8 +48,8 @@ public:
 			else if (tid == this->FasterTimerId)
 			{
 				timer->StartTimer();
-				this->BMM->Modified();
-				this->BMM->Update();
+				this->System->Modified();
+				this->System->Update();
 				timer->StopTimer();
 
 				std::cout << "[Test] Execution Rate: " << 1/(timer->GetElapsedTime()) << "\n";
@@ -81,9 +81,9 @@ public:
 		this->RenderTimerId = tid;
 	}
 
-	void SetBMM(vtkCUDAParticleSystem * bmm)
+	void SetSystem(vtkCUDAParticleSystem * bmm)
 	{
-		this->BMM = bmm;
+		this->System = bmm;
 	}
 
 	void SetContactIds(vtkIdList * list)
@@ -97,7 +97,7 @@ private:
 
 	vtkIdList * List;
 
-	vtkCUDAParticleSystem * BMM;
+	vtkCUDAParticleSystem * System;
 };
 
 int main(int argc, char * argv[])
@@ -114,23 +114,25 @@ int main(int argc, char * argv[])
 		exit(0);
 	}
 
+	double dt = 0.001;
+
 	vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
 	reader->SetFileName(filename);
 	reader->Update();
 
 	vtkPolyData * mesh = reader->GetOutput();
 
-	vtkCUDAParticleSystem* ParticleSpringSystem = vtkCUDAParticleSystem::New();
-	ParticleSpringSystem->SetInput(mesh);
-	ParticleSpringSystem->SetSolverType(vtkCUDAMotionEquationSolver::RungeKutta4);
-	ParticleSpringSystem->SetSpringCoefficient(250);
-	ParticleSpringSystem->SetDistanceCoefficient(10);
-	ParticleSpringSystem->SetDampingCoefficient(5);//Friction
-	ParticleSpringSystem->SetMass(.1);
-	ParticleSpringSystem->SetDeltaTime(0.005);//10ms
-	ParticleSpringSystem->Init();
+	vtkCUDAParticleSystem* system = vtkCUDAParticleSystem::New();
+	system->SetInput(mesh);
+	system->SetSolverType(vtkCUDAMotionEquationSolver::RungeKutta4);
+	system->SetSpringCoefficient(350);
+	system->SetDistanceCoefficient(10);
+	system->SetDampingCoefficient(3);//Friction
+	system->SetMass(.1);
+	system->SetDeltaTime(dt);//1ms
+	system->Init();
 
-	ParticleSpringSystem->Print(cout);
+	system->Print(cout);
 
 	vtkRenderer * renderer = vtkRenderer::New();
 
@@ -140,20 +142,20 @@ int main(int argc, char * argv[])
 	mesh->GetBounds(bounds);
 
 	vtkIdList * list = vtkIdList::New();
-	double p[3] = {0, bounds[2], 0};
+	double p[3] = {bounds[0], bounds[2], 0};
 
 	locator->SetDataSet(mesh);
-	locator->FindClosestNPoints(3, p, list);
+	locator->FindClosestNPoints(5, p, list);
 
 	//Set Contact
 	double dir[3];
-	dir[0] = 0;//-0.1;
+	dir[0] = 0.1;//-0.1;
 	dir[1] = 0.2;
 	dir[2] = 0;//0.05;
 
 	for(vtkIdType i = 0; i< list->GetNumberOfIds(); i++)
 	{
-		ParticleSpringSystem->InsertCollision(list->GetId(i), dir);
+		system->InsertCollision(list->GetId(i), dir);
 	}
 
 	vtkRenderWindow * renWin = vtkRenderWindow::New();
@@ -172,7 +174,7 @@ int main(int argc, char * argv[])
 	actor->GetProperty()->SetColor(0,1,0);
 
 	vtkPolyDataMapper * mapper2 = vtkPolyDataMapper::New();
-	mapper2->SetInput(ParticleSpringSystem->GetOutput());
+	mapper2->SetInput(system->GetOutput());
 	mapper2->ScalarVisibilityOff();
 
 	vtkActor * actor2 = vtkActor::New();
@@ -180,7 +182,7 @@ int main(int argc, char * argv[])
 	actor2->GetProperty()->SetColor(1,0,0);
 	actor2->GetProperty()->SetRepresentationToWireframe();
 
-	//renderer->AddActor(actor);
+	renderer->AddActor(actor);
 	renderer->AddActor(actor2);
 	renderer->SetBackground(1,1,1);
 
@@ -196,21 +198,21 @@ int main(int argc, char * argv[])
 	iren->AddObserver(vtkCommand::TimerEvent, cb);
 	int tid;
 
-	cb->SetBMM(ParticleSpringSystem);
+	cb->SetSystem(system);
 
 	//Create a faster timer for BMM update
-	tid = iren->CreateRepeatingTimer(10);
+	tid = iren->CreateRepeatingTimer(dt*10);
 	cb->SetFasterTimerId(tid);
 
 	// Create a slower repeating timer to trigger Render calls.
 	// (This fires at the rate of approximately 25 frames per second.)
 	//
-	tid = iren->CreateRepeatingTimer(25);
+	tid = iren->CreateRepeatingTimer(40);
 	cb->SetRenderTimerId(tid);
 
 	iren->Start();
 
-	ParticleSpringSystem->Delete();
+	system->Delete();
 	mapper->Delete();
 	actor->Delete();
 	mapper2->Delete();

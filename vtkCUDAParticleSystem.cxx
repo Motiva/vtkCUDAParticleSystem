@@ -171,13 +171,13 @@ int vtkCUDAParticleSystem::RequestData(
 
 
 	//Compute Collisions
-	this->ComputeContacts();
+	this->ComputeCollisions();
 
 	this->Solver->ComputeNextStep(this->hPos, this->hVel, this->hAcc);
 
 	//DisplayParticleVectors();
 
-	output->ShallowCopy(input);
+	output->DeepCopy(input);
 
 	//Update output points
 	vtkPoints * points = output->GetPoints();
@@ -218,10 +218,8 @@ void vtkCUDAParticleSystem::SetCollisions(vtkIdList * ids, vtkDoubleArray * disp
 }
 
 //----------------------------------------------------------------------------
-void vtkCUDAParticleSystem::ComputeContacts()
+void vtkCUDAParticleSystem::ComputeCollisions()
 {
-	double position[3];
-
 	if(this->CollisionIds && this->CollisionIds->GetNumberOfIds() != 0)
 	{
 		for (vtkIdType i = 0; i < this->CollisionIds->GetNumberOfIds(); i++)

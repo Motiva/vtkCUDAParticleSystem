@@ -1,5 +1,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 IF(COMMAND CMAKE_POLICY)
+  CMAKE_POLICY(SET CMP0002 NEW)
   CMAKE_POLICY(SET CMP0003 NEW)
   CMAKE_POLICY(SET CMP0011 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
@@ -104,8 +105,8 @@ IF(VTK_FOUND)
     ${PROJECT_BINARY_DIR}
     "${PROJECT_NAME}Configure.h")
 
-  # CUDA Support  
-  OPTION(USE_CUDA "Enable the use of CUDA GPU computation" OFF)
+  # CUDA Support
+  OPTION(USE_CUDA "Enable the use of CUDA GPU computation" ON)
   IF(USE_CUDA)
     FIND_PACKAGE(CUDA REQUIRED)
     
@@ -121,8 +122,7 @@ IF(VTK_FOUND)
     )
     
     IF(CUDA_FOUND)
-      #MESSAGE("Cuda Found")
-      
+       
       INCLUDE_DIRECTORIES(${CUDA_INCLUDE_DIRECTORIES}
                           ${CUDA_SDK_ROOT_DIR}/C/common/inc
                           ${CUDA_TOOLKIT_INCLUDE})
